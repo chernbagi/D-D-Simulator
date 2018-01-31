@@ -1,0 +1,250 @@
+//all attacks
+export let AtWills = {
+  'fighter': {
+    'attacks': ['cleave', 'reapingStrike', 'sureStrike', 'tideOfIron'],
+    'cleave': {
+      'name': 'Cleave',
+      'target': 1,
+      'damage': 1,
+      'modifier': 'strength',
+      'defense': 'ac',
+      'plusMod': 0,
+      'extraAttack': true,
+      'extraTarget': 1,
+      'extraDamage': 'mod',
+      'extraMod': 'strength',
+      'miss': false,
+      'chosen': false,
+      'blurb': 'Single Target, Str vs. AC. 1W+Str Mod Damage, adjacent enemy takes Str Mod Damage'
+    },
+    'reapingStrike': {
+      'name': 'Reaping Strike',
+      'target': 1,
+      'damage': 1,
+      'modifier': 'strength',
+      'defense': 'ac',
+      'plusMod': 0,
+      'extraAttack': false,
+      'miss': true,
+      'missDamage': 0,
+      'missMod': 'strength',
+      'chosen': false,
+      'blurb': 'Single Target, Str vs. AC. 1W + Str Mod Damage, on miss Str Mod/2 damage. If heavy weapon equipped, Str Mod damage.'
+    },
+    'sureStrike': {
+      'name': 'Sure Strike',
+      'target': 1,
+      'damage': 1,
+      'modifier': 'strength',
+      'defense': 'ac',
+      'plusMod': 2,
+      'extraAttack': false,
+      'miss': false,
+      'chosen': false,
+      'blurb': 'Single Target, Str + 2 vs. AC. 1W+Str Mod Damage.'
+    },
+    'tideOfIron': {
+      'name': 'Tide Of Iron',
+      'target': 1,
+      'damage': 1,
+      'modifier': 'strength',
+      'defense': 'ac',
+      'plusMod': 2,
+      'extraAttack': true,
+      'extraTarget': 1,
+      'extraDamage': 'push',
+      'pushTarget': 'attackTarget',
+      'distance': 1,
+      'secondaryAttack': false,
+      'miss': false,
+      'chosen': false,
+      'blurb': 'Single Target, Str vs. AC. 1W+Str Mod Damage, push target one square.'
+    },
+  },
+}
+
+export let Encounters = {
+  'fighter': {
+    1: {
+      'attacks': ['coveringAttack', 'passingAttack', 'spinningSweep', 'steelSerpantStrike'],
+      'coveringAttack': {
+        'name': 'Covering Attack',
+        'target': 1,
+        'damage': 2,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 0,
+        'extraAttack': true,
+        'extraTarget': 1,
+        'extraDamage': 'push',
+        'pushTarget': 'ally',
+        'distance': 2,
+        'secondaryAttack': false,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 2W+Str Mod Damage, shift adjacent ally 2 squares'
+      },
+      'passingAttack': {
+        'name': 'Passing Attack',
+        'target': 1,
+        'damage': 1,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 0,
+        'extraAttack': true,
+        'extraTarget': 1,
+        'extraDamage': 'shift',
+        'distance': 1,
+        'secondaryAttack': true,
+        'secondaryTarget': 1,
+        'secondaryDamage': 'mod',
+        'secondaryMod': 'strength',
+        'secondaryPlusMod': 2,
+        'secondaryDamage': 1,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 2W+Str Mod Damage, shift 1 square. Make secondary attack, 1 target. Str + 2 vs. AC. 1W+Str Mod Damage.'
+      },
+      'spinningSweep': {
+        'name': 'Spinning Sweep',
+        'target': 1,
+        'damage': 1,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 2,
+        'extraAttack': true,
+        'extraTarget': 1,
+        'extraDamage': 'prone',
+        'proneTarget': 'attackTarget',
+        'secondaryAttack': false,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 1W+Str Mod Damage, knock target prone.'
+      },
+      'steelSerpantStrike': {
+        'name': 'Steel Serpant Strike',
+        'target': 1,
+        'damage': 2,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 2,
+        'extraAttack': true,
+        'extraTarget': 1,
+        'extraDamage': 'slow',
+        'slowTarget': 'attackTarget',
+        'secondaryAttack': false,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 2W+Str Mod Damage, target is slowed.'
+      },
+    },
+    2: {},
+  },
+}
+
+export let Dailies = {
+  'fighter': {
+    1: {
+      'attacks': ['bruteStrike', 'comebackStrike', 'villainsMenace'],
+      'bruteStrike': {
+        'name': 'Brute Strike',
+        'target': 1,
+        'damage': 3,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 0,
+        'extraAttack': false,
+        'secondaryAttack': false,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 3W+Str Mod Damage.'
+      },
+      'comebackStrike': {
+        'name': 'Comeback Strike',
+        'target': 1,
+        'damage': 2,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 0,
+        'extraAttack': true,
+        'extraTarget': 1,
+        'extraDamage': 'surge',
+        'secondaryAttack': false,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 2W+Str Mod Damage, spend healing surge.'
+      },
+      'villainsMenace': {
+        'name': 'Villain\'s Menace',
+        'target': 1,
+        'damage': 2,
+        'modifier': 'strength',
+        'defense': 'ac',
+        'plusMod': 2,
+        'extraAttack': true,
+        'extraTarget': 1,
+        'extraDamage': 'rollBonus',
+        'attackRollBonus': 2,
+        'damageRollBonus': 4,
+        'proneTarget': 'proneTarget',
+        'secondaryAttack': false,
+        'miss': false,
+        'chosen': false,
+        'blurb': 'Single Target, Str vs. AC. 2W+Str Mod Damage. +2 to attack rolls and +4 to damage rolls until the end of your next turn.'
+      },
+    },
+    2: {},
+  },
+}
+
+export let Utilities = {
+  'fighter': {
+    1: {},
+    2: {
+      'attacks': ['boundlessEndurance', 'getOverHere', 'noOpening', 'unstoppable'],
+      'boundlessEndurance': {
+        'name': 'Boundless Endurance',
+        'type': 'daily',
+        'target': 'self',
+        'effect': 'healing',
+        'modifier': 'constitution',
+        'plusMod': 2,
+        'activation': 'bloodied',
+        'chosen': false,
+        'blurb': 'gain regeneration 2 + your Constitution modifier when bloodied.'
+      },
+      'getOverHere': {
+        'name': 'Get Over Here',
+        'type': 'encounter',
+        'target': 'ally',
+        'effect': 'shift',
+        'distance': 2,
+        'activation': 'adjacent',
+        'chosen': false,
+        'blurb': 'Slide target 2 squares to a square adjacent to you.'
+      },
+      'noOpening': {
+        'name': 'No Opening',
+        'type': 'encounter',
+        'target': 'attacker',
+        'effect': 'cancel',
+        'cancel': 'combatAdvantage',
+        'activation': 'immediateInterrupt',
+        'chosen': false,
+        'blurb': ' Cancel combat advantage you were about to grant to the attack.'
+      },
+      'unstoppable': {
+        'name': 'Unstoppable',
+        'type': 'daily',
+        'target': 'self',
+        'effect': 'healing',
+        'modifier': 'constitution',
+        'plusMod': 'rolls',
+        'rollNum': 2,
+        'activation': 'bloodied',
+        'chosen': false,
+        'blurb': 'Gain temporary hit points equal to 2d6 + your Constitution modifier.'
+      },
+    },
+  },
+}
