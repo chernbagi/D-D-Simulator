@@ -1,6 +1,5 @@
 // //key binding for input handling
 import {DATASTORE} from './datastore.js'
-import {Message} from './message.js'
 
 class keyBinder {
   constructor(Game){
@@ -32,7 +31,8 @@ export class BattleInput extends keyBinder{
         this.Game.switchMode('persistence');
         return true;
       }
-      if (evt.key == "w" || evt.key == "s" || evt.key == "a" || evt.key == "d" || evt.key == "z" || evt.key == "m" || evt.key == "i" || evt.key == "h") {
+      if (evt.key == "w" || evt.key == "s" || evt.key == "a" || evt.key == "d" || evt.key == "z" || evt.key == "m" || evt.key == "i" || evt.key == "h"
+          || evt.key == "Enter") {
         return evt.key;
       }
     }
@@ -115,10 +115,13 @@ export class AimInput extends keyBinder {
         this.Game.switchMode('battle');
         return true;
       }
-    }
-    if (eventType == 'keyup') {
-      if (evt.key == "1" || evt.key == "2" || evt.key == "3" || evt.key == "4") {
-        Message.send("Choose a direction to aim your attack with wsad")
+      if (evt.key == "b") {
+        this.Game.switchMode('attack');
+        return true;
+      }
+      if (evt.key == "1" || evt.key == "2" || evt.key == "3" || evt.key == "4" ||
+          evt.key == "5" || evt.key == "6" || evt.key == "7" || evt.key == "8" ||
+          evt.key == "9") {
         return evt.key;
       }
     }

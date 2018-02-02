@@ -1,6 +1,6 @@
 import ROT from 'rot-js';
 import * as U from './util.js';
-import {StartupMode, BattleMode, WinMode, LoseMode, CacheMode, HelpMode, PersistenceMode, LevelMode, ControlMode, AimMode} from './ui_mode.js';
+import {StartupMode, BattleMode, WinMode, LoseMode, CacheMode, HelpMode, PersistenceMode, LevelMode, ControlMode, AttackMode, AimMode} from './ui_mode.js';
 import {Message} from './message.js';
 import {DATASTORE} from './datastore.js';
 import {Timer} from './time.js'
@@ -40,6 +40,7 @@ SPACING: 1.1,
     persistence: '',
     level: '',
     control:'',
+    attack:'',
     aim: '',
   },
   curMode: '',
@@ -76,6 +77,7 @@ SPACING: 1.1,
     this.modes.help = new HelpMode(this);
     this.modes.persistence = new PersistenceMode(this);
     this.modes.level = new LevelMode(this);
+    this.modes.attack = new AttackMode(this);
     this.modes.control = new ControlMode(this);
     this.modes.aim = new AimMode(this);
   },

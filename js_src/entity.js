@@ -14,9 +14,6 @@ export class Entity extends MixableSymbol {
     this.state.y = 0;
     this.state.setupMapID = 0;
     this.state.id = uniqueID();
-    console.log("template")
-    console.log(template)
-    console.log(template.type)
     this.state.type = template.type;
 
   }

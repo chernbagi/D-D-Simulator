@@ -70,7 +70,7 @@ export let PlayerMessage = {
       Message.send("Choose two stats to raise");
     },
     'choosingAttack': function(evtData){
-      Message.send("You have chosen " + evtData.attack)
+      Message.send("You have chosen " + evtData.attack['name']);
     }
   }
 };
@@ -500,6 +500,7 @@ export let PlayerStats = {
         return true;
       } else {
         this.raiseMixinEvent('chooseTwo');
+        this.setSP(2);
         return false;
       }
     },
@@ -657,6 +658,9 @@ export let PlayerAbilities = {
       this.state._PlayerAbilities.levelDailies = {};
       this.state._PlayerAbilities.levelUtilities = {};
 
+      this.state._PlayerAbilities.currentAttack = {};
+      this.state._PlayerAbilities.currentTarget = {};
+
       this.state._PlayerAbilities.classAtWills['attacks'] = AtWills[this.getClass()].attacks;
       this.state._PlayerAbilities.levelEncounters['attacks'] = Encounters[this.getClass()][this.getLevel()].attacks;
       this.state._PlayerAbilities.levelDailies['attacks'] = Dailies[this.getClass()][this.getLevel()].attacks;
@@ -698,35 +702,50 @@ export let PlayerAbilities = {
     },
     setAttacks: function(){
       for (let i = 0; i < AtWills[this.getClass()].attacks.length; i++) {
-        if (this.isChosen(attack, AtWills[this.getClass()])) {
+        if (this.isChosen(AtWills[this.getClass()].attacks[i], AtWills[this.getClass()])) {
           this.state._PlayerAbilities.atWills[AtWills[this.getClass()].attacks[i]] = AtWills[this.getClass()][AtWills[this.getClass()].attacks[i]];
         }
       }
-        for (let i = 1; i <= this.getLevel(); i++) {
+      for (let i = 1; i <= this.getLevel(); i++) {
         if (Encounters[this.getClass()][i].attacks) {
           for (let j = 0; j < Encounters[this.getClass()][i].attacks.length; j++) {
-            if (this.isChosen(Encounters[this.getClass()][i].attacks[j]), Encounters[this.getClass()][i]) {
-              this.state._PlayerAbilities.encounters[this.getClass()][i].attacks[j] = Encounters[this.getClass()][i][Encounters[this.getClass()][this.getLevel()].attacks[j]];
+            console.dir(Encounters[this.getClass()][i]);
+            if (this.isChosen(Encounters[this.getClass()][i].attacks[j], Encounters[this.getClass()][i])) {
+              this.state._PlayerAbilities.encounters[Encounters[this.getClass()][i].attacks[j]] = Encounters[this.getClass()][i][Encounters[this.getClass()][this.getLevel()].attacks[j]];
             }
           }
         }
-      if (Dailies[this.getClass()][i].attacks) {
-        for (let j = 0; j < Dailies[this.getClass()][i].attacks.length; j++) {
-          if (this.isChosen(Dailies[this.getClass()][i].attacks[j]), Dailies[this.getClass()][i]) {
-            this.state._PlayerAbilities.dailies[this.getClass()][i].attacks[j] = Dailies[this.getClass()][i][Dailies[this.getClass()][this.getLevel()].attacks[j]];
+        if (Dailies[this.getClass()][i].attacks) {
+          for (let j = 0; j < Dailies[this.getClass()][i].attacks.length; j++) {
+            if (this.isChosen(Dailies[this.getClass()][i].attacks[j], Dailies[this.getClass()][i])) {
+              this.state._PlayerAbilities.dailies[Dailies[this.getClass()][i].attacks[j]] = Dailies[this.getClass()][i][Dailies[this.getClass()][this.getLevel()].attacks[j]];
+            }
           }
         }
-      }
         if (Utilities[this.getClass()][i].attacks) {
           for (let j = 0; j < Utilities[this.getClass()][i].attacks.length; j++) {
-            if (this.isChosen(Utilities[this.getClass()][i].attacks[j]), Utilities[this.getClass()][i]) {
-              this.state._PlayerAbilities.utilities[this.getClass()][i].attacks[j] = Utilities[this.getClass()][i][Utilities[this.getClass()][this.getLevel()].attacks[j]];
+            if (this.isChosen(Utilities[this.getClass()][i].attacks[j], Utilities[this.getClass()][i])) {
+              this.state._PlayerAbilities.utilities[Utilities[this.getClass()][i].attacks[j]] = Utilities[this.getClass()][i][Utilities[this.getClass()][this.getLevel()].attacks[j]];
             }
           }
         }
       }
     },
+    getCurrentAttack: function() {
+      return this.state._PlayerAbilities.currentAttack;
+    },
+    setCurrentAttack: function(attack) {
+      this.state._PlayerAbilities.currentAttack = attack;
+    },
+    getCurrentTarget: function() {
+      return this.state._PlayerAbilities.currentTarget;
+    },
+    setCurrentTarget: function(target) {
+      this.state._PlayerAbilities.currentTarget = target;
+    },
     isChosen: function(attack, place) {
+      console.dir(attack);
+      console.dir(place);
       return place[attack].chosen;
     },
     setChoice: function(attack, place, choice) {
@@ -763,7 +782,7 @@ export let PlayerAbilities = {
     'chooseAttack': function(evtData) {
       this.setChoice(evtData.attack, evtData.place, true);
       this.setAttacks();
-      this.raiseMixinEvent('choosingAttack', {attack: evtData.attack});
+      this.raiseMixinEvent('choosingAttack', {attack: evtData.place[evtData.attack]});
     }
   }
 };

@@ -1,7 +1,7 @@
 {
-  "name": "weedstrikeroguelike",
-  "version": "1.0.0",
-  "description": "A roguelike game using rot.js",
+  "name": "dndsim",
+  "version": "1.0.1",
+  "description": "Dungeons and Dragons Simulator",
   "main": "index.js",
   "directories": {
     "doc": "doc"

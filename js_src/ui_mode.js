@@ -102,6 +102,8 @@ export class BattleMode extends UIMode {
     let a = EntityFactory.create('Example');
     this.state.avatarID = a.getID();
     m.addEntityAtRandomPosition(a);
+    let b = EntityFactory.create('Example');
+    m.addEntityAtRandomPosition(b);
     console.log('battle mode - new game started');
     this.moveCameratoAvatar();
     Message.clearCache();
@@ -141,10 +143,11 @@ export class BattleMode extends UIMode {
       display.clear();
       display.drawText(0, 0, "What will you do?");
       display.drawText(0, 1, "Move - wsad");
-      display.drawText(0, 2, "Attack - z (not yet implemented)");
+      display.drawText(0, 2, "Attack - z");
       display.drawText(0, 3, "Get Info - i");
       display.drawText(0, 4, "Help Mode - h");
-      display.drawText(0, 5, "Check Previous Messages - m");
+      display.drawText(0, 5, "Check Messages - m");
+      display.drawText(0, 6, "End Turn - Enter");
     }
 
   }
@@ -224,7 +227,7 @@ export class BattleMode extends UIMode {
       return true;
     }
     if (eventOutput == 'z') {
-      //this.Game.switchMode('attack');
+      this.Game.switchMode('attack');
       return true;
     }
     if (eventOutput == 'm') {
@@ -233,6 +236,11 @@ export class BattleMode extends UIMode {
     }
     if (eventOutput == 'h') {
       this.Game.switchMode('help');
+      return true;
+    }
+    if (eventOutput == 'Enter') {
+      Message.send('Ending' + this.getAvatar().getName() + '\'s turn.')
+      //this.endTurn();
       return true;
     }
     if (eventOutput == 'i') {
@@ -510,6 +518,23 @@ export class PersistenceMode extends UIMode {
   }
 }
 
+export class ControlMode extends UIMode {
+  enter() {
+    if (!this.controlHandler){
+      this.controlHandler = new ControlInput(this.Game);
+    }
+  }
+  render(display) {
+    display.clear();
+    display.drawText(0, 0, "Use wsad to move. ");
+    display.drawText(0, 1, "To execute an attack,press z and choose your action.");
+    display.drawText(28, 15, "Press any key to continue");
+  }
+  handleInput(eventType, evt){
+    return this.controlHandler.handleInput(eventType, evt);
+  }
+}
+
 export class LevelMode extends UIMode {
   enter(){
     console.log('level')
@@ -543,7 +568,12 @@ export class LevelMode extends UIMode {
         if (eventOutput == '1') {
           this.renderAtWills(this.Game.display.info.o)
           if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
-            this.getAvatar().setChoice(this.getAvatar().getClassAtWills()['attacks'][secondaryOutput-1], AtWills[this.getAvatar().getClass()], true);
+            if (this.getAvatar().isChosen(this.getAvatar().getClassAtWills()['attacks'][secondaryOutput*1-1], AtWills[this.getAvatar().getClass()])) {
+              Message.send('You have already selected this power');
+              this.eventOutput = false;
+              return true;
+            }
+            this.getAvatar().raiseMixinEvent('chooseAttack', {attack: this.getAvatar().getClassAtWills()['attacks'][secondaryOutput*1-1], place: AtWills[this.getAvatar().getClass()]});
             this.allowedAtWills -= 1;
             this.eventOutput = false;
             return true;
@@ -562,7 +592,12 @@ export class LevelMode extends UIMode {
         if (eventOutput == '2') {
           this.renderEncounters(this.Game.display.info.o)
           if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
-            this.getAvatar().setChoice(this.getAvatar().getLevelEncounters()['attacks'][secondaryOutput-1], Encounters[this.getAvatar().getClass()][this.getAvatar().getLevel()], true);
+            if (this.getAvatar().isChosen(this.getAvatar().getLevelEncounters()['attacks'][secondaryOutput*1-1], Encounters[this.getAvatar().getClass()][this.getAvatar().getLevel()])) {
+              Message.send('You have already selected this power');
+              this.eventOutput = false;
+              return true;
+            }
+            this.getAvatar().raiseMixinEvent('chooseAttack', {attack: this.getAvatar().getLevelEncounters()['attacks'][secondaryOutput*1-1], place: Encounters[this.getAvatar().getClass()][this.getAvatar().getLevel()]});
             this.allowedEncounters -= 1;
             this.eventOutput = false;
             return true;
@@ -582,7 +617,12 @@ export class LevelMode extends UIMode {
         if (eventOutput == '3') {
           this.renderDailies(this.Game.display.info.o)
           if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
-            this.getAvatar().setChoice(this.getAvatar().getLevelDailies()['attacks'][secondaryOutput-1], Dailies[this.getAvatar().getClass()][this.getAvatar().getLevel()], true);
+            if (this.getAvatar().isChosen(this.getAvatar().getLevelDailies()['attacks'][secondaryOutput*1-1], Dailies[this.getAvatar().getClass()][this.getAvatar().getLevel()])) {
+              Message.send('You have already selected this power');
+              this.eventOutput = false;
+              return true;
+            }
+            this.getAvatar().raiseMixinEvent('chooseAttack', {attack: this.getAvatar().getLevelDailies()['attacks'][secondaryOutput*1-1], place: Dailies[this.getAvatar().getClass()][this.getAvatar().getLevel()]});
             this.allowedDailies -= 1;
             this.eventOutput = false;
             return true;
@@ -602,7 +642,12 @@ export class LevelMode extends UIMode {
         if (eventOutput == '4') {
           this.renderUtilities(this.Game.display.info.o)
           if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
-            this.getAvatar().setChoice(this.getAvatar().getLevelUtilites()['attacks'][secondaryOutput-1], Utilites[this.getAvatar().getClass()][this.getAvatar().getLevel()], true);
+            if (this.getAvatar().isChosen(this.getAvatar().getLevelUtilites()['attacks'][secondaryOutput*1-1], Utilites[this.getAvatar().getClass()][this.getAvatar().getLevel()])) {
+              Message.send('You have already selected this power');
+              this.eventOutput = false;
+              return true;
+            }
+            this.getAvatar().raiseMixinEvent('chooseAttack', {attack: this.getAvatar().getLevelUtilites()['attacks'][secondaryOutput*1-1], place: Utilites[this.getAvatar().getClass()][this.getAvatar().getLevel()]});
             this.allowedUtilities -= 1;
             this.eventOutput = false;
             return true;
@@ -620,50 +665,55 @@ export class LevelMode extends UIMode {
       }
       if (eventOutput == '5') {
         this.renderStats(this.Game.display.info.o);
-        if (secondaryOutput == '1') {
-          this.getAvatar().addStr(1);
-          this.getAvatar().addSP(-1);
-          Message.send('1 Strength Point Added');
-          this.eventOutput = false;
-          return true;
-        }
-        if (secondaryOutput == '2') {
-          this.getAvatar().addCon(1);
-          this.getAvatar().setMaxHp((this.getAvatar().getVit() + (this.getAvatar().getLevel() - 1)));
-          this.getAvatar().addSP(-1);
-          Message.send('1 Constitution Point Added');
-          this.eventOutput = false;
-          return true;
-        }
-        if (secondaryOutput == '3') {
-          this.getAvatar().addDex(1);
-          this.getAvatar().setInit();
-          this.getAvatar().addSP(-1);
-          Message.send('1 Dexterity Point Added');
-          this.eventOutput = false;
-          return true;
-        }
-        if (secondaryOutput == '4') {
-          this.getAvatar().addInt(1);
-          this.getAvatar().setMaxHp((this.getAvatar().getVit() + (this.getAvatar().getLevel() - 1)));
-          this.getAvatar().addSP(-1);
-          Message.send('1 Intelligence Point Added');
-          this.eventOutput = false;
-          return true;
-        }
-        if (secondaryOutput == '5') {
-          this.getAvatar().addWis(1);
-          this.getAvatar().addSP(-1);
-          Message.send('1 Wisdom Point Added');
-          this.eventOutput = false;
-          return true;
-        }
-        if (secondaryOutput == '6') {
-          this.getAvatar().addCha(1);
-          this.getAvatar().addSP(-1);
-          Message.send('1 Charisma Point Added');
-          this.eventOutput = false;
-          return true;
+        if (this.getAvatar().getSP() != 0) {
+          Message.send('Choose 2 stats to add a point to')
+          if (secondaryOutput == '1') {
+            this.getAvatar().addStr(1);
+            this.getAvatar().addSP(-1);
+            Message.send('1 Strength Point Added');
+            this.eventOutput = false;
+            return true;
+          }
+          if (secondaryOutput == '2') {
+            this.getAvatar().addCon(1);
+            this.getAvatar().setMaxHp((this.getAvatar().getVit() + (this.getAvatar().getLevel() - 1)));
+            this.getAvatar().addSP(-1);
+            Message.send('1 Constitution Point Added');
+            this.eventOutput = false;
+            return true;
+          }
+          if (secondaryOutput == '3') {
+            this.getAvatar().addDex(1);
+            this.getAvatar().setInit();
+            this.getAvatar().addSP(-1);
+            Message.send('1 Dexterity Point Added');
+            this.eventOutput = false;
+            return true;
+          }
+          if (secondaryOutput == '4') {
+            this.getAvatar().addInt(1);
+            this.getAvatar().setMaxHp((this.getAvatar().getVit() + (this.getAvatar().getLevel() - 1)));
+            this.getAvatar().addSP(-1);
+            Message.send('1 Intelligence Point Added');
+            this.eventOutput = false;
+            return true;
+          }
+          if (secondaryOutput == '5') {
+            this.getAvatar().addWis(1);
+            this.getAvatar().addSP(-1);
+            Message.send('1 Wisdom Point Added');
+            this.eventOutput = false;
+            return true;
+          }
+          if (secondaryOutput == '6') {
+            this.getAvatar().addCha(1);
+            this.getAvatar().addSP(-1);
+            Message.send('1 Charisma Point Added');
+            this.eventOutput = false;
+            return true;
+          }
+        } else if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
+          Message.send('You have no stat points left to use.')
         }
         if (secondaryOutput == 'b') {
           this.renderInfo(this.Game.display.info.o);
@@ -705,10 +755,8 @@ export class LevelMode extends UIMode {
     let abilityNum =  1;
     display.drawText(0, line, "Encounters")
     line += 1;
-    console.log(this.getAvatar().getLevelEncounters());
     for (let attack in this.getAvatar().getLevelEncounters()) {
       if (attack != 'attacks') {
-        console.log(this.getAvatar().getLevelEncounters()[attack])
         display.drawText(0, line, abilityNum + " - " + this.getAvatar().getLevelEncounters()[attack].name);
         line += 1;
         console.log(this.getAvatar().getLevelEncounters()[attack])
@@ -775,6 +823,7 @@ export class LevelMode extends UIMode {
     display.drawText(0, 3, "4 - Utilites");
     display.drawText(0, 4, "5 - Stats");
     display.drawText(0, 5, "6 - Feats");
+    display.drawText(0, 6, "b to reselect");
   }
   renderStats(display){
     display.clear();
@@ -788,20 +837,196 @@ export class LevelMode extends UIMode {
   }
 }
 
-export class ControlMode extends UIMode {
-  enter() {
-    if (!this.controlHandler){
-      this.controlHandler = new ControlInput(this.Game);
+export class AttackMode extends UIMode {
+  enter(){
+    if (!this.levelHandler){
+      this.levelHandler = new LevelInput(this.Game);
     }
+    this.eventOutput = false;
+    this.evtOut = '';
+    this.attackList = [];
   }
-  render(display) {
-    display.clear();
-    display.drawText(0, 0, "Use wsad to move. ");
-    display.drawText(0, 1, "To execute an attack,press z and choose your action.");
-    display.drawText(28, 15, "Press any key to continue");
+  getAvatar() {
+    return DATASTORE.ENTITIES[this.Game.modes.battle.state.avatarID];
   }
   handleInput(eventType, evt){
-    return this.controlHandler.handleInput(eventType, evt);
+    let eventOutput = this.evtOut;
+    if (eventType == 'keyup') {
+      let secondaryOutput = '';
+      if (this.eventOutput) {
+        secondaryOutput = this.levelHandler.handleInput(eventType, evt)
+      } else {
+        eventOutput = this.levelHandler.handleInput(eventType, evt);
+        this.evtOut = eventOutput;
+        this.eventOutput = true;
+      }
+      if (this.getAvatar().getStandard() != 0) {
+        if (eventOutput == '1') {
+          this.renderAtWills(this.Game.display.info.o)
+          console.log(secondaryOutput*1-1);
+          console.log(this.attackList);
+          console.log(this.attackList[secondaryOutput*1-1]);
+          console.log(this.getAvatar().getAtWills()[this.attackList[secondaryOutput*1-1]]);
+          if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
+            if (this.getAvatar().getAtWills()[this.attackList[secondaryOutput*1-1]]) {
+              this.getAvatar().setCurrentAttack(this.getAvatar().getAtWills()[this.attackList[secondaryOutput*1-1]]);
+              this.attackList = [];
+            } else {
+              return false;
+            }
+            this.eventOutput = false;
+            this.Game.switchMode('aim');
+          }
+          if (secondaryOutput == 'b') {
+            this.renderInfo(this.Game.display.info.o);
+            this.eventOutput = false;
+            return true;
+          }
+        }
+        if (eventOutput == '2') {
+          this.renderEncounters(this.Game.display.info.o)
+          if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
+            if (this.getAvatar().getEncounters()[this.attackList[secondaryOutput*1-1]]) {
+              this.getAvatar().setCurrentAttack(this.getAvatar().getEncounters()[this.attackList[secondaryOutput*1-1]]);
+              this.attackList = [];
+            } else {
+              return false;
+            }
+            this.eventOutput = false;
+            this.Game.switchMode('aim');
+          }
+          if (secondaryOutput == 'b') {
+            this.renderInfo(this.Game.display.info.o);
+            this.eventOutput = false;
+            return true;
+          }
+        }
+        if (eventOutput == '3') {
+          this.renderDailies(this.Game.display.info.o)
+          if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6') {
+            if (this.getAvatar().getDailies()[this.attackList[secondaryOutput*1-1]]) {
+              this.getAvatar().setCurrentAttack(this.getAvatar().getDailies()[this.attackList[secondaryOutput*1-1]]);
+              this.attackList = [];
+            } else {
+              return false;
+            }
+            this.eventOutput = false;
+            this.Game.switchMode('aim');
+          }
+          if (secondaryOutput == 'b') {
+            this.renderInfo(this.Game.display.info.o);
+            this.eventOutput = false;
+            return true;
+          }
+        }
+        if (eventOutput == '4') {
+          this.renderUtilities(this.Game.display.info.o)
+          if (secondaryOutput == '1' || secondaryOutput == '2' || secondaryOutput == '3' || secondaryOutput == '4' || secondaryOutput == '5' || secondaryOutput == '6' || secondaryOutput == '7') {
+            if (this.getAvatar().getUtilities()[this.attackList[secondaryOutput*1-1]]) {
+              this.getAvatar().setCurrentAttack(this.getAvatar().getUtilities()[this.attackList[secondaryOutput*1-1]]);
+              this.attackList = [];
+            } else {
+              return false;
+            }
+            this.eventOutput = false;
+            this.Game.switchMode('aim');
+          }
+          if (secondaryOutput == 'b') {
+            this.renderInfo(this.Game.display.info.o);
+            this.eventOutput = false;
+            return true;
+          }
+        }
+      } else {
+        Message.send('You have already used your attack for this turn');
+        this.Game.switchMode('battle');
+        return false;
+      }
+    }
+  }
+  renderAtWills(display) {
+    display.clear();
+    let attacks = '';
+    let line = 0;
+    let abilityNum =  1;
+    display.drawText(0, line, "At Wills");
+    line += 1;
+    for (let attack in this.getAvatar().getAtWills()) {
+      attacks = attacks + attack + ",";
+      display.drawText(0, line, abilityNum + " - " + this.getAvatar().getAtWills()[attack].name);
+      line += 1;
+      display.drawText(0, line,  this.getAvatar().getAtWills()[attack].blurb);
+      line += Math.floor(this.getAvatar().getAtWills()[attack].blurb.length/20 + 1);
+      abilityNum += 1;
+    }
+    this.attackList = attacks.split(",");
+  }
+  renderEncounters(display) {
+    display.clear();
+    let attacks = '';
+    let line = 0;
+    let abilityNum =  1;
+    display.drawText(0, line, "Encounters")
+    line += 1;
+    for (let attack in this.getAvatar().getEncounters()) {
+      attacks = attacks + attack + ",";
+      display.drawText(0, line, abilityNum + " - " + this.getAvatar().getEncounters()[attack].name);
+      line += 1;
+      console.log(this.getAvatar().getEncounters()[attack])
+      display.drawText(0, line, this.getAvatar().getEncounters()[attack].blurb);
+      line += Math.floor(this.getAvatar().getEncounters()[attack].blurb.length/20 + 1);
+      abilityNum += 1;
+    }
+    this.attackList = attacks.split(",");
+  }
+  renderDailies(display) {
+    display.clear();
+    let attacks = '';
+    let line = 0;
+    let abilityNum =  1;
+    display.drawText(0, line, "Dailies")
+    line += 1;
+    for (let attack in this.getAvatar().getDailies()) {
+      attacks = attacks + attack + ",";
+      display.drawText(0, line, abilityNum + " - " + this.getAvatar().getDailies()[attack].name);
+      line += 1;
+      display.drawText(0, line, this.getAvatar().getDailies()[attack].blurb);
+      line += Math.floor(this.getAvatar().getDailies()[attack].blurb.length/20 + 1);
+      abilityNum += 1;
+    }
+    this.attackList = attacks.split(",");
+  }
+  renderUtilities(display) {
+    display.clear();
+    let attacks = '';
+    let line = 0;
+    let abilityNum =  1;
+    display.drawText(0, line, "Utilities")
+    line += 1;
+    for (let attack in this.getAvatar().getUtilities()) {
+      attacks = attacks + attack + ",";
+      display.drawText(0, line, abilityNum + " - " + this.getAvatar().getUtilities()[attack].name);
+      line +=  1;
+      display.drawText(0, line,  this.getAvatar().getUtilities()[attack].blurb);
+      line += Math.floor(this.getAvatar().getUtilities()[attack].blurb.length/20 + 1);
+      abilityNum += 1;
+    }
+    this.attackList = attacks.split(",");
+  }
+  render(display) {
+
+  }
+  renderAvatar(display){
+
+  }
+  renderInfo(display){
+    display.clear();
+    display.drawText(0, 0, "Attack Mode");
+    display.drawText(0, 1, "1 - At Wills");
+    display.drawText(0, 2, "2 - Encounters");
+    display.drawText(0, 3, "3 - Dailies");
+    display.drawText(0, 4, "4 - Utilites");
+    display.drawText(0, 15, "Press esc to exit");
   }
 }
 
@@ -810,18 +1035,43 @@ export class AimMode extends UIMode{
     if (!this.aimHandler){
       this.aimHandler = new AimInput(this.Game);
     }
-    Message.send("Entered Aim Mode. Select your Attack")
+    Message.send("Entered Aim Mode. Select your target.")
+    this.enemies = [];
   }
   getAvatar() {
     return DATASTORE.ENTITIES[this.Game.modes.battle.state.avatarID];
   }
   handleInput(eventType, evt){
+    let eventOutput = this.aimHandler.handleInput(eventType, evt);
+    if (eventOutput == "1" || eventOutput == "2" || eventOutput == "3" || eventOutput == "4" ||
+        eventOutput == "5" || eventOutput == "6" || eventOutput == "7" || eventOutput == "8" ||
+        eventOutput == "9") {
+      this.getAvatar().setCurrentTarget(DATASTORE.ENTITIES[this.enemies[eventOutput*1-1]]);
+      this.getAvatar().raiseMixinEvent('spendStandard');
+      Message.send(this.getAvatar().getName() + " attacks " + this.getAvatar().getCurrentTarget().getName() + " with " + this.getAvatar().getCurrentAttack().name);
+      this.Game.switchMode('battle');
 
+    }
   }
-  render (display) {
+  render(display) {
 
   }
   renderAvatar(display){
 
+  }
+  renderInfo(display){
+    display.clear();
+    let enemies = '';
+    display.drawText(0, 0, "Aim Mode");
+    let line = 1;
+    for (let ent in DATASTORE.ENTITIES) {
+      //if (DATASTORE.ENTITIES[ent].getType() != this.getAvatar().getType()) {
+        display.drawText(0, line, line + " - " + DATASTORE.ENTITIES[ent].getType());
+        line += 1;
+        enemies = enemies + ent + ",";
+      //}
+    }
+    display.drawText(0, line, "Hit b to reselect")
+    this.enemies = enemies.split(",")
   }
 }
