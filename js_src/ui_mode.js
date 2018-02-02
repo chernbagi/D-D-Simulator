@@ -239,7 +239,7 @@ export class BattleMode extends UIMode {
       return true;
     }
     if (eventOutput == 'Enter') {
-      Message.send('Ending' + this.getAvatar().getName() + '\'s turn.')
+      Message.send('Ending ' + this.getAvatar().getName() + '\'s turn.')
       //this.endTurn();
       return true;
     }
